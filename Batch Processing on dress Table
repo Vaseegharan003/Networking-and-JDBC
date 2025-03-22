@@ -1,0 +1,50 @@
+import java.sql.*;
+
+public class BatchInsertDress {
+    private static final String URL = "jdbc:mysql://localhost:3306/your_database";
+    private static final String USER = "root";
+    private static final String PASSWORD = "root";
+
+    public static void main(String[] args) {
+        String sql = "INSERT INTO dress (dress_id, dress_name, size, price) VALUES (?, ?, ?, ?)";
+        
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            conn.setAutoCommit(false); // Start transaction
+            
+            // Adding batch entries
+            pstmt.setInt(1, 101);
+            pstmt.setString(2, "Evening Gown");
+            pstmt.setString(3, "M");
+            pstmt.setBigDecimal(4, new java.math.BigDecimal("129.99"));
+            pstmt.addBatch();
+            
+            pstmt.setInt(1, 102);
+            pstmt.setString(2, "Casual Dress");
+            pstmt.setString(3, "L");
+            pstmt.setBigDecimal(4, new java.math.BigDecimal("59.99"));
+            pstmt.addBatch();
+            
+            pstmt.setInt(1, 103);
+            pstmt.setString(2, "Summer Dress");
+            pstmt.setString(3, "S");
+            pstmt.setBigDecimal(4, new java.math.BigDecimal("79.99"));
+            pstmt.addBatch();
+            
+            pstmt.setInt(1, 104);
+            pstmt.setString(2, "Wedding Dress");
+            pstmt.setString(3, "XL");
+            pstmt.setBigDecimal(4, new java.math.BigDecimal("299.99"));
+            pstmt.addBatch();
+            
+            // Execute batch
+            int[] results = pstmt.executeBatch();
+            conn.commit(); // Commit transaction
+            
+            System.out.println("Batch insert completed successfully. Rows affected: " + results.length);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
